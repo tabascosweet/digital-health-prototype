@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitt MindCare Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  :root {
+    --blue: #003594;
+    --blue-mid: #1a4aab;
+    --blue-light: #E8EEFA;
+    --gold: #FFB81C;
+    --gold-dark: #CC9200;
+    --gold-light: #FFF8E6;
+    --lavender: #7B6FA0;
+    --coral: #C0392B;
+    --coral-light: #FDECEA;
+    --slate: #1A2340;
+    --slate-mid: #3D4F6B;
+    --slate-light: #7A8AA0;
+    --bg: #F5F7FB;
+    --white: #FFFFFF;
+    --border: #DDE3EF;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(0,53,148,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,53,148,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #B0BDD4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  /* the phone shell */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 38px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+    border: 3px solid #0a0f1e;
+    flex-shrink: 0;
+  }
+
+  .status-bar {
+    background: var(--blue);
+    padding: 12px 24px 8px;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* top nav bar with back button */
+  .top-nav {
+    background: var(--blue);
+    padding: 6px 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+  }
+  .back-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 34px; height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .top-nav h1 { font-size: 17px; font-weight: 800; font-family: inherit; }
+
+  .screen { display: none; flex-direction: column; height: 100%; }
+  .screen.active { display: flex; }
+
+  /* scrollable content area inside each screen */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .scroll-area::-webkit-scrollbar { width: 3px; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--slate-light);
+    margin-bottom: 10px;
+  }
+
+  /* home header */
+  .home-header {
+    background: linear-gradient(155deg, var(--blue) 0%, #001f5c 100%);
+    padding: 22px 20px 26px;
+    color: white;
+  }
+  .home-header .greeting { font-size: 14px; opacity: 0.75; margin-bottom: 4px; font-weight: 600; }
+  .home-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 16px; }
+
+  /* gold notification strip */
+  .gold-banner {
+    background: var(--gold);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--slate);
+    cursor: pointer;
+  }
+  .notif-dot {
+    width: 9px; height: 9px;
+    background: var(--coral);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* 2x2 nav grid */
+  .quick-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .quick-link {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--slate);
+    font-family: inherit;
+  }
+  .quick-link:hover { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .quick-link .ql-bar {
+    width: 24px; height: 3px;
+    border-radius: 2px;
+    margin: 0 auto 10px;
+  }
+
+  /* the gold ai button - ✨ is the only emoji we kept */
+  .ai-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, var(--gold) 0%, #FFC84A 100%);
+    color: var(--slate);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 800;
+    box-shadow: 0 4px 16px rgba(255,184,28,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-align: left;
+    font-family: inherit;
+  }
+  .ai-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,184,28,0.5); }
+  .ai-btn .ai-icon {
+    width: 42px; height: 42px;
+    min-width: 42px;
+    background: rgba(0,53,148,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .ai-btn .btn-sub { font-size: 12.5px; font-weight: 600; opacity: 0.65; margin-top: 3px; }
+
+  /* mood check-in */
+  .mood-scale {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .mood-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--slate-mid);
+    cursor: pointer;
+    padding: 12px 4px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .mood-btn:hover, .mood-btn.selected {
+    background: var(--blue-light);
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+  .mood-pip {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+  }
+  .mood-btn.selected .mood-pip { background: var(--blue); }
+
+  .sleep-scale { display: flex; gap: 8px; margin-top: 10px; }
+  .sleep-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--slate-mid);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .sleep-btn:hover, .sleep-btn.selected {
+    background: var(--blue-light);
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  /* bar chart */
+  .mood-chart { display: flex; align-items: flex-end; gap: 6px; height: 90px; border-bottom: 2px solid var(--border); }
+  .mood-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .mood-bar { width: 100%; border-radius: 4px 4px 0 0; flex-shrink: 0; }
+  .mood-bar.gold { background: var(--gold); }
+  .mood-bar.blue { background: var(--blue); }
+  .mood-day { font-size: 10px; color: var(--slate-light); font-weight: 700; }
+  .trend-label { font-size: 12px; color: #5A8A6A; font-weight: 700; margin-top: 8px; }
+
+  /* med cards */
+  .med-name { font-size: 18px; font-weight: 800; color: var(--slate); }
+  .med-dose { font-size: 14px; color: var(--blue); font-weight: 700; margin-top: 3px; margin-bottom: 14px; }
+  .med-row {
+    display: flex; gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--slate-mid);
+    line-height: 1.5;
+  }
+  .med-row .tag {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 2px;
+    min-width: 32px;
+  }
+
+  /* visit notes */
+  .diag-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .diag-stripe { width: 4px; height: 38px; border-radius: 2px; flex-shrink: 0; }
+  .diag-name { font-weight: 700; font-size: 15px; color: var(--slate); }
+  .diag-code { font-size: 12px; color: var(--slate-light); margin-top: 2px; }
+
+  .plan-item {
+    display: flex; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--slate-mid);
+    line-height: 1.5;
+  }
+  .plan-item:last-child { border-bottom: none; }
+  .plan-num { font-weight: 800; color: var(--blue); min-width: 20px; }
+  .plan-num.red { color: var(--coral); }
+
+  /* ai panel that slides up from the bottom */
+  .ai-panel {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 40px rgba(0,53,148,0.18);
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    max-height: 85%;
+    display: flex;
+    flex-direction: column;
+  }
+  .ai-panel.open { transform: translateY(0); }
+
+  .panel-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .panel-avatar {
+    width: 38px; height: 38px; min-width: 38px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .panel-header h3 { font-size: 15px; font-weight: 800; color: var(--slate); }
+  .panel-header p { font-size: 11px; color: var(--slate-light); margin-top: 1px; }
+
+  /* close button - perfect circle */
+  .close-btn {
+    margin-left: auto;
+    background: var(--border);
+    border: none;
+    width: 30px; height: 30px; min-width: 30px;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--slate-mid);
+    flex-shrink: 0;
+  }
+
+  .panel-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .panel-body::-webkit-scrollbar { width: 3px; }
+  .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* what the ai is reviewing */
+  .context-chip {
+    background: var(--gold-light);
+    border: 1px solid rgba(255,184,28,0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--gold-dark);
+    font-weight: 700;
+  }
+
+  /* typing animation */
+  .thinking { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate-light); }
+  .dots span {
+    display: inline-block;
+    width: 7px; height: 7px;
+    background: var(--blue);
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: bounce 1.2s infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .ai-response { display: none; flex-direction: column; gap: 14px; }
+  .ai-response.visible { display: flex; }
+
+  /* plain english explanation block */
+  .plain-english {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    border-radius: 0 10px 10px 0;
+    padding: 14px;
+  }
+  .plain-english .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); margin-bottom: 6px; }
+  .plain-english p { font-size: 15px; color: var(--slate); line-height: 1.65; }
+  .plain-english.gold { background: var(--gold-light); border-left-color: var(--gold); }
+  .plain-english.gold .label { color: var(--gold-dark); }
+
+  /* bullet list of steps */
+  .steps h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--slate-light); margin-bottom: 10px; }
+  .step-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px; color: var(--slate); line-height: 1.5;
+  }
+  .step-item:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 6px; }
+  .dot.blue { background: var(--blue); }
+  .dot.red { background: var(--coral); }
+
+  .warm-note {
+    background: var(--gold-light);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--slate-mid);
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .urgent {
+    background: var(--coral-light);
+    border-left: 4px solid var(--coral);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--coral);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* bottom panel buttons */
+  .panel-footer {
+    display: flex; gap: 8px;
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .panel-footer button {
+    flex: 1; padding: 13px;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-secondary { background: var(--border); color: var(--slate); }
+
+  /* disclaimer under panel footer */
+  .panel-disclaimer {
+    font-size: 11px;
+    color: var(--slate-light);
+    text-align: center;
+    padding: 0 20px 12px;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  /* chat screen */
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    background: var(--bg);
+  }
+  .chat-messages::-webkit-scrollbar { width: 3px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .msg { display: flex; flex-direction: column; }
+  .msg-label { font-size: 11px; color: var(--slate-light); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .msg-label.right { text-align: right; }
+  .bubble {
+    max-width: 85%;
+    padding: 13px 15px;
+    border-radius: 16px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .bubble.ai { background: white; color: var(--slate); border: 1px solid var(--border); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+  .bubble.user { background: var(--blue); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+
+  /* suggestion chips */
+  .chips {
+    padding: 10px 14px;
+    display: flex; gap: 7px; flex-wrap: wrap;
+    background: white;
+    border-top: 1px solid var(--border);
+  }
+  .chip {
+    background: var(--blue-light);
+    border: 1px solid rgba(0,53,148,0.2);
+    color: var(--blue);
+    padding: 7px 13px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .chip:hover { background: var(--blue); color: white; }
+
+  /* chat input */
+  .chat-bar {
+    padding: 12px 14px;
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+    flex-shrink: 0;
+  }
+  .chat-bar input {
+    flex: 1;
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    padding: 11px 16px;
+    font-size: 15px;
+    outline: none;
+    color: var(--slate);
+    font-family: inherit;
+    background: var(--bg);
+  }
+  .chat-bar input:focus { border-color: var(--blue); background: white; }
+  .send-btn {
+    background: var(--blue);
+    color: white;
+    border: none;
+    width: 46px; height: 46px; min-width: 46px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .send-btn:hover { background: var(--blue-mid); }
+
+  /* overlay behind the ai panel */
+  .backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,20,70,0.4);
+    z-index: 99;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .backdrop.active { opacity: 1; pointer-events: auto; }
+
+  /* gold wordmark bar */
+  .pitt-bar {
+    background: var(--gold);
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wordmark { font-size: 11px; font-weight: 800; color: var(--blue); letter-spacing: 0.06em; }
+  .pitt-mark {
+    width: 18px; height: 18px;
+    background: var(--blue);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 900; color: var(--gold);
+  }
+
+  /* language bar */
+  .lang-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 7px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lang-bar label { font-size: 12px; font-weight: 700; color: var(--slate-light); }
+  .lang-bar select {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate);
+    background: var(--bg);
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+  .lang-bar select:focus { border-color: var(--blue); }
+  #langNote { font-size: 11px; color: var(--slate-light); }
+
+  /* provider initials avatar */
+  .provider-row { display: flex; align-items: center; gap: 12px; }
+  .provider-avatar {
+    width: 40px; height: 40px; min-width: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: white;
+  }
+  .provider-name { font-weight: 700; font-size: 15px; color: var(--slate); }
+  .provider-role { font-size: 12px; color: var(--slate-light); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+
+  <!-- ai panel shared across all screens -->
+  <div class="ai-panel" id="aiPanel">
+    <div class="panel-handle"></div>
+    <div class="panel-header">
+      <div class="panel-avatar">✨</div>
+      <div>
+        <h3>MindCare Assistant</h3>
+        <p>Explains your information in plain language</p>
+      </div>
+      <button class="close-btn" onclick="closePanel()">&#x2715;</button>
+    </div>
+    <div class="panel-body" id="panelBody"></div>
+    <div class="panel-footer">
+      <button class="btn-secondary" onclick="closePanel()">Close</button>
+      <button class="btn-primary">Message My Provider</button>
+    </div>
+    <div class="panel-disclaimer">This assistant explains information only. It does not diagnose, adjust medications, or replace your provider's advice. Your data stays within the Pitt MindCare system.</div>
+  </div>
+
+  <!-- home screen -->
+  <div class="screen active" id="screen-home">
+    <div class="status-bar"><span>9:41 AM</span><span>100%</span></div>
+    <div class="pitt-bar">
+      <span class="wordmark">PITT MINDCARE PORTAL</span>
+      <div class="pitt-mark">P</div>
+    </div>
+    <div class="lang-bar">
+      <label>Language</label>
+      <select onchange="setLang(this.value)">
+        <option value="en">English</option>
+        <option value="es">Espa&#241;ol</option>
+        <option value="zh">&#20013;&#25991;</option>
+        <option value="ar">&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;</option>
+        <option value="fr">Fran&#231;ais</option>
+      </select>
+      <span id="langNote"></span>
+    </div>
+    <div class="home-header">
+      <div class="greeting">Welcome back,</div>
+      <h1>Pitts Burgh</h1>
+    </div>
+    <div class="scroll-area">
+
+      <div class="gold-banner" onclick="showScreen('notes')">
+        <div class="notif-dot"></div>
+        New visit notes from Dr. Pan Ther are ready
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('home')">
+        <div class="ai-icon">✨</div>
+        <div>
+          Explain My Care Summary
+          <div class="btn-sub">Get a simple overview of your mental health plan</div>
+        </div>
+      </button>
+
+      <div class="quick-links">
+        <div class="quick-link" onclick="showScreen('mood')">
+          <div class="ql-bar" style="background:var(--gold)"></div>
+          Mood Log
+        </div>
+        <div class="quick-link" onclick="showScreen('meds')">
+          <div class="ql-bar" style="background:var(--blue)"></div>
+          Medications
+        </div>
+        <div class="quick-link" onclick="showScreen('notes')">
+          <div class="ql-bar" style="background:var(--gold)"></div>
+          Visit Notes
+        </div>
+        <div class="quick-link" onclick="showScreen('chat')">
+          <div class="ql-bar" style="background:var(--blue)"></div>
+          Ask a Question
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Next Appointment</div>
+        <div style="font-weight:800;font-size:16px;color:var(--slate);">Dr. Pan Ther</div>
+        <div style="font-size:14px;color:var(--blue);font-weight:700;margin-top:3px;">Tuesday, July 15 at 3:00 PM</div>
+        <div style="font-size:13px;color:var(--slate-light);margin-top:2px;">Pitt MindCare Clinic, Oakland</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Your Care Team</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="provider-row">
+            <div class="provider-avatar" style="background:var(--blue);">PT</div>
+            <div>
+              <div class="provider-name">Dr. Pan Ther, MD</div>
+              <div class="provider-role">Psychiatrist</div>
+            </div>
+          </div>
+          <div class="provider-row">
+            <div class="provider-avatar" style="background:var(--lavender);">CL</div>
+            <div>
+              <div class="provider-name">Dr. Cat A. Lyst, LCSW</div>
+              <div class="provider-role">Licensed Clinical Social Worker</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- mood log screen -->
+  <div class="screen" id="screen-mood">
+    <div class="status-bar"><span>9:41 AM</span><span>100%</span></div>
+    <div class="top-nav">
+      <button class="back-btn" onclick="showScreen('home')">&#8249;</button>
+      <h1>Mood Check-In</h1>
+    </div>
+    <div class="scroll-area">
+
+      <div class="card">
+        <div class="card-label">How are you feeling today?</div>
+        <div class="mood-scale">
+          <button class="mood-btn" onclick="selectMood(this)"><div class="mood-pip"></div>Low</button>
+          <button class="mood-btn" onclick="selectMood(this)"><div class="mood-pip"></div>Anxious</button>
+          <button class="mood-btn" onclick="selectMood(this)"><div class="mood-pip"></div>Okay</button>
+          <button class="mood-btn" onclick="selectMood(this)"><div class="mood-pip"></div>Good</button>
+          <button class="mood-btn" onclick="selectMood(this)"><div class="mood-pip"></div>Great</button>
+        </div>
+        <div style="margin-top:18px;">
+          <div style="font-size:11px;font-weight:700;color:var(--slate-light);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Sleep last night</div>
+          <div class="sleep-scale">
+            <button class="sleep-btn" onclick="selectSleep(this)">Poor</button>
+            <button class="sleep-btn" onclick="selectSleep(this)">Fair</button>
+            <button class="sleep-btn" onclick="selectSleep(this)">Good</button>
+            <button class="sleep-btn" onclick="selectSleep(this)">Great</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">This Week's Mood Trend</div>
+        <div class="mood-chart">
+          <div class="mood-bar-col"><div class="mood-bar blue" style="height:45px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar blue" style="height:55px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar blue" style="height:32px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar blue" style="height:63px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar gold" style="height:72px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar gold" style="height:68px"></div></div>
+          <div class="mood-bar-col"><div class="mood-bar gold" style="height:80px"></div></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">M</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">T</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">W</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">Th</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">F</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">Sa</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);font-weight:700;">Su</div>
+        </div>
+        <div class="trend-label">Trending upward this week</div>
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('mood')">
+        <div class="ai-icon">✨</div>
+        <div>
+          What Does My Mood Pattern Mean?
+          <div class="btn-sub">Help me understand these trends</div>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- medications screen -->
+  <div class="screen" id="screen-meds">
+    <div class="status-bar"><span>9:41 AM</span><span>100%</span></div>
+    <div class="top-nav">
+      <button class="back-btn" onclick="showScreen('home')">&#8249;</button>
+      <h1>My Medications</h1>
+    </div>
+    <div class="scroll-area">
+
+      <div class="card">
+        <div class="med-name">Sertraline (Zoloft)</div>
+        <div class="med-dose">50 mg, once daily</div>
+        <div class="med-row"><span class="tag">When</span>Every morning, with or without food</div>
+        <div class="med-row"><span class="tag">Note</span>Takes 4 to 6 weeks to feel the full effect</div>
+        <div class="med-row"><span class="tag">Warn</span>Do not stop suddenly. Talk to Dr. Pan Ther first</div>
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('med-sertraline')">
+        <div class="ai-icon">✨</div>
+        <div>
+          Help Me Understand This Medication
+          <div class="btn-sub">What is it, how does it work, what to expect?</div>
+        </div>
+      </button>
+
+      <div class="card">
+        <div class="med-name">Lorazepam (Ativan)</div>
+        <div class="med-dose">0.5 mg, as needed</div>
+        <div class="med-row"><span class="tag">When</span>Only during intense anxiety episodes</div>
+        <div class="med-row"><span class="tag">Warn</span>Do not drive after taking</div>
+        <div class="med-row"><span class="tag">Warn</span>Never mix with alcohol</div>
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('med-lorazepam')" style="background:linear-gradient(135deg,#003594,#1a4aab);color:white;box-shadow:0 4px 16px rgba(0,53,148,0.3);">
+        <div class="ai-icon" style="background:rgba(255,255,255,0.15)">✨</div>
+        <div>
+          Help Me Understand This Medication
+          <div class="btn-sub">What is it, when should I use it?</div>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- visit notes screen -->
+  <div class="screen" id="screen-notes">
+    <div class="status-bar"><span>9:41 AM</span><span>100%</span></div>
+    <div class="top-nav">
+      <button class="back-btn" onclick="showScreen('home')">&#8249;</button>
+      <h1>Visit Notes</h1>
+    </div>
+    <div class="scroll-area">
+
+      <div class="card">
+        <div class="card-label">Visit with Dr. Pan Ther, June 18, 2026</div>
+        <div class="diag-row" style="background:var(--blue-light);">
+          <div class="diag-stripe" style="background:var(--blue);"></div>
+          <div>
+            <div class="diag-name">Generalized Anxiety Disorder</div>
+            <div class="diag-code">ICD-10: F41.1</div>
+          </div>
+        </div>
+        <div class="diag-row" style="background:var(--gold-light);">
+          <div class="diag-stripe" style="background:var(--gold);"></div>
+          <div>
+            <div class="diag-name">Major Depressive Disorder, Moderate</div>
+            <div class="diag-code">ICD-10: F32.1</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('notes-diagnoses')">
+        <div class="ai-icon">✨</div>
+        <div>
+          What Do These Diagnoses Mean?
+          <div class="btn-sub">Explained in simple, plain language</div>
+        </div>
+      </button>
+
+      <div class="card">
+        <div class="card-label">Your Action Plan</div>
+        <div class="plan-item"><span class="plan-num">1.</span>Practice 4-7-8 breathing when you feel anxious</div>
+        <div class="plan-item"><span class="plan-num">2.</span>Log your mood daily so Dr. Pan Ther can track your progress</div>
+        <div class="plan-item"><span class="plan-num">3.</span>Attend weekly therapy with Dr. Cat A. Lyst on Wednesdays</div>
+        <div class="plan-item"><span class="plan-num">4.</span>Limit caffeine after 2 PM to support better sleep</div>
+        <div class="plan-item"><span class="plan-num red">5.</span>Call the office or go to the ER if you have thoughts of hurting yourself</div>
+      </div>
+
+      <button class="ai-btn" onclick="openPanel('notes-plan')" style="background:linear-gradient(135deg,#003594,#1a4aab);color:white;box-shadow:0 4px 16px rgba(0,53,148,0.3);">
+        <div class="ai-icon" style="background:rgba(255,255,255,0.15)">✨</div>
+        <div>
+          Help Me Understand My Action Plan
+          <div class="btn-sub">Break this into simple daily steps</div>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ai chat screen -->
+  <div class="screen" id="screen-chat">
+    <div class="status-bar"><span>9:41 AM</span><span>100%</span></div>
+    <div class="top-nav">
+      <button class="back-btn" onclick="showScreen('home')">&#8249;</button>
+      <h1>Ask a Question</h1>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg">
+        <div class="msg-label">MindCare Assistant</div>
+        <div class="bubble ai">Hi Pitts. Ask me anything about your medications, diagnoses, or visit notes and I will explain it in plain language. I cannot give medical advice or change your treatment plan.</div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <div class="chip" onclick="sendChip(this, 'What is Sertraline and how does it work?')">What is Sertraline?</div>
+      <div class="chip" onclick="sendChip(this, 'What is Generalized Anxiety Disorder?')">What is GAD?</div>
+      <div class="chip" onclick="sendChip(this, 'How do I do the 4-7-8 breathing exercise?')">4-7-8 breathing?</div>
+      <div class="chip" onclick="sendChip(this, 'Can you change my dose of Sertraline?')">Can you change my dose?</div>
+      <div class="chip" onclick="sendChip(this, 'Do I have bipolar disorder?')">Do I have bipolar?</div>
+    </div>
+
+    <div class="chat-bar">
+      <input type="text" id="chatInput" placeholder="Type your question..." onkeydown="if(event.key==='Enter') sendChat()">
+      <button class="send-btn" onclick="sendChat()">&#10148;</button>
+    </div>
+  </div>
+
+</div><!-- end phone wrapper -->
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  closePanel();
+}
+
+const panelContent = {
+  home: {
+    context: 'Your MindCare Summary',
+    thinking: 1200,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ Plain Language Overview</div>
+        <p>You are being treated for anxiety and depression by Dr. Pan Ther. You take one medication every day to help stabilize your mood, and a second one to use only during intense anxiety. You are also attending weekly therapy. Things are moving in the right direction.</p>
+      </div>
+      <div class="warm-note">"Progress in mental health is not always a straight line, and that is okay. Every check-in you complete is a step forward."</div>
+      <div class="steps">
+        <h4>Your focus areas right now</h4>
+        <div class="step-item"><span class="dot blue"></span>Take Sertraline every morning, even on good days</div>
+        <div class="step-item"><span class="dot"></span>Log your mood daily so Dr. Pan Ther can track your progress</div>
+        <div class="step-item"><span class="dot blue"></span>Attend weekly therapy with Dr. Cat A. Lyst</div>
+        <div class="step-item"><span class="dot"></span>Next appointment: July 15 with Dr. Pan Ther</div>
+      </div>
+    `
+  },
+  mood: {
+    context: 'Your Mood Trend This Week',
+    thinking: 1000,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ What This Means</div>
+        <p>Your mood has been trending upward, especially toward the end of the week. This is a good sign that Sertraline may be starting to take effect. It usually takes 4 to 6 weeks to feel the full benefit, so this early improvement is encouraging.</p>
+      </div>
+      <div class="warm-note">Dr. Pan Ther will review this chart at your next visit to see how you are responding to treatment.</div>
+      <div class="steps">
+        <h4>Things that may be helping</h4>
+        <div class="step-item"><span class="dot"></span>Better sleep this week, which directly affects mood</div>
+        <div class="step-item"><span class="dot blue"></span>Sertraline may be starting to take effect</div>
+        <div class="step-item"><span class="dot"></span>Weekly therapy provides a consistent source of support</div>
+      </div>
+    `
+  },
+  'med-sertraline': {
+    context: 'Sertraline (Zoloft) 50 mg',
+    thinking: 1100,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ What This Medication Does</div>
+        <p>Sertraline increases serotonin in your brain, a chemical that helps regulate mood, sleep, and emotions. Think of it as helping your brain stay more stable. It is commonly prescribed for both depression and anxiety.</p>
+      </div>
+      <div class="steps">
+        <h4>What to know</h4>
+        <div class="step-item"><span class="dot blue"></span>Takes 4 to 6 weeks to feel the full effect. Give it time</div>
+        <div class="step-item"><span class="dot"></span>Mild nausea or disrupted sleep in the first week or two is normal and usually passes</div>
+        <div class="step-item"><span class="dot red"></span>Never stop suddenly. Talk to Dr. Pan Ther first</div>
+        <div class="step-item"><span class="dot blue"></span>Take it at the same time every day, even when you feel fine</div>
+      </div>
+      <div class="urgent">If you notice worsening mood, agitation, or thoughts of self-harm after starting, call Dr. Pan Ther's office right away.</div>
+    `
+  },
+  'med-lorazepam': {
+    context: 'Lorazepam (Ativan) 0.5 mg',
+    thinking: 1000,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ What This Medication Does</div>
+        <p>Lorazepam is a fast-acting medication for moments when anxiety spikes sharply. It calms your nervous system and can reduce a racing heart, muscle tension, or difficulty breathing. It usually works within 15 to 30 minutes.</p>
+      </div>
+      <div class="steps">
+        <h4>Important reminders</h4>
+        <div class="step-item"><span class="dot blue"></span>Use only during intense episodes. This is not a daily medication</div>
+        <div class="step-item"><span class="dot red"></span>Do not drive after taking it</div>
+        <div class="step-item"><span class="dot red"></span>Never mix with alcohol</div>
+        <div class="step-item"><span class="dot"></span>Log each use in your mood tracker so Dr. Pan Ther can monitor the pattern</div>
+      </div>
+      <div class="urgent">This medication can be habit-forming if used too often. If you find yourself needing it daily, contact Dr. Pan Ther's office.</div>
+    `
+  },
+  'notes-diagnoses': {
+    context: 'Your Diagnoses',
+    thinking: 1200,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ Generalized Anxiety Disorder (GAD)</div>
+        <p>GAD means your brain tends to stay in a state of worry even when there is nothing specific to worry about. It is a real medical condition, not a personal failing. Many people with GAD also have physical symptoms like tension, trouble sleeping, or a fast heartbeat.</p>
+      </div>
+      <div class="plain-english gold">
+        <div class="label">✨ Major Depressive Disorder (MDD), Moderate</div>
+        <p>MDD means you experience persistent low mood or low energy that affects daily life. It is very treatable. Depression is a medical condition, not a sign of weakness.</p>
+      </div>
+      <div class="warm-note">Both conditions are common and respond well to the medication and therapy you are already doing. You are in the right place.</div>
+    `
+  },
+  'notes-plan': {
+    context: 'Your Action Plan',
+    thinking: 1000,
+    response: `
+      <div class="plain-english">
+        <div class="label">✨ In Simple Terms</div>
+        <p>Dr. Pan Ther wants you to use a calming breathing technique when anxiety peaks, track your mood daily, attend weekly therapy, and cut back on caffeine in the afternoon. These habits work alongside your medication to help you feel more stable.</p>
+      </div>
+      <div class="steps">
+        <h4>Daily routine</h4>
+        <div class="step-item"><span class="dot blue"></span>Morning: Take Sertraline and log your mood</div>
+        <div class="step-item"><span class="dot"></span>Afternoon: No caffeine after 2 PM</div>
+        <div class="step-item"><span class="dot blue"></span>When anxious: Breathe in for 4 sec, hold for 7, exhale for 8. Repeat 3 times</div>
+        <div class="step-item"><span class="dot"></span>Wednesdays: Therapy with Dr. Cat A. Lyst</div>
+        <div class="step-item"><span class="dot"></span>Evening: Log your sleep and mood before bed</div>
+      </div>
+      <div class="urgent">If you ever have thoughts of hurting yourself, call 988 or go to your nearest emergency room. You can also message Dr. Pan Ther's office directly.</div>
+    `
+  }
+};
+
+function openPanel(type) {
+  const data = panelContent[type];
+  if (!data) return;
+  const body = document.getElementById('panelBody');
+  body.innerHTML = `
+    <div class="context-chip">Reviewing: ${data.context}</div>
+    <div class="thinking" id="thinkingState">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Reading and simplifying your information...
+    </div>
+    <div class="ai-response" id="aiResponse">${data.response}</div>
+  `;
+  document.getElementById('aiPanel').classList.add('open');
+  document.getElementById('backdrop').classList.add('active');
+  setTimeout(() => {
+    const t = document.getElementById('thinkingState');
+    const r = document.getElementById('aiResponse');
+    if (t) t.style.display = 'none';
+    if (r) r.classList.add('visible');
+  }, data.thinking);
+}
+
+function closePanel() {
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('active');
+}
+
+function selectMood(el) {
+  el.closest('.mood-scale').querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectSleep(el) {
+  el.closest('.sleep-scale').querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+const chatResponses = {
+  sertraline: `Sertraline (Zoloft) is an antidepressant that increases serotonin in your brain, a chemical that helps regulate mood and anxiety. It takes 4 to 6 weeks to feel the full benefit, so keep taking it consistently even before you notice a change.\n\nNote: I can explain what this medication is, but I cannot advise on dosing or changes. Please contact Dr. Pan Ther's office for that.`,
+  gad: `Generalized Anxiety Disorder (GAD) means your brain stays in a heightened state of worry even without a specific trigger. It is a real medical condition, not a personal choice. The combination of medication and therapy you are doing addresses it from both sides.\n\nNote: I am explaining this term as it appears in your records. I cannot assess or confirm diagnoses.`,
+  breathing: `The 4-7-8 breathing technique: inhale through your nose for 4 seconds, hold for 7 seconds, then exhale through your mouth for 8 seconds. Repeat 3 to 4 times. It helps calm your nervous system and can interrupt an anxiety episode quickly.`,
+  depression: `Major Depressive Disorder (MDD) is more than sadness. It affects energy, focus, sleep, and motivation. "Moderate" means it is significantly impacting your daily life but is very treatable with medication and therapy.\n\nNote: I am explaining this term as it appears in your records. I cannot assess or confirm diagnoses.`,
+  dose_change: `That is a question for Dr. Pan Ther, not for me. I cannot recommend changes to your medication, dose, or schedule. Only your provider can do that safely.\n\nYou can message Dr. Pan Ther using the "Message My Provider" button, or call the Pitt MindCare Clinic directly.`,
+  diagnose: `I am not able to diagnose conditions or tell you what you might have based on symptoms. That requires a full clinical evaluation by a licensed provider.\n\nIf you have concerns, please contact Dr. Pan Ther's office or speak with your care team.`,
+  default: `I can explain your diagnoses, medications, and visit notes in plain language. For medical advice or anything urgent, please use the "Message My Provider" button or call 988 if you need immediate support.`
+};
+
+function sendChip(el, text) {
+  el.remove();
+  addUserMsg(text);
+  showAITyping(getReply(text.toLowerCase()));
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addUserMsg(text);
+  input.value = '';
+  showAITyping(getReply(text.toLowerCase()));
+}
+
+function getReply(lower) {
+  // don't let the ai give dosing advice
+  if (lower.includes('change my dose') || lower.includes('increase') || lower.includes('decrease') || lower.includes('stop taking') || lower.includes('switch medication') || lower.includes('should i take') || lower.includes('take more') || lower.includes('take less')) return chatResponses.dose_change;
+  // also block any "do i have X" type questions
+  if (lower.includes('do i have') || lower.includes('what do i have')) return chatResponses.diagnose;
+  // ok these are all fine to answer
+  if (lower.includes('sertraline') || lower.includes('zoloft') || lower.includes('medication') || lower.includes('med')) return chatResponses.sertraline;
+  if (lower.includes('gad') || lower.includes('anxiety')) return chatResponses.gad;
+  if (lower.includes('breathing') || lower.includes('4-7-8') || lower.includes('breathe')) return chatResponses.breathing;
+  if (lower.includes('depression') || lower.includes('mdd') || lower.includes('depressed')) return chatResponses.depression;
+  return chatResponses.default;
+}
+
+function addUserMsg(text) {
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML += `<div class="msg"><div class="msg-label right">You</div><div class="bubble user" style="align-self:flex-end">${text}</div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showAITyping(reply) {
+  const msgs = document.getElementById('chatMessages');
+  const id = 'typing-' + Date.now();
+  msgs.innerHTML += `<div class="msg" id="${id}"><div class="msg-label">MindCare Assistant</div><div class="bubble ai"><div class="dots"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = `<div class="msg-label">MindCare Assistant</div><div class="bubble ai">${reply}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1200);
+}
+
+function setLang(val) {
+  const note = document.getElementById('langNote');
+  if (val === 'en') { note.textContent = ''; return; }
+  const names = { es: 'Español', zh: '中文', ar: 'العربية', fr: 'Français' };
+  note.textContent = names[val] + ': translation coming soon';
+}
+</script>
+</body>
+</html>
